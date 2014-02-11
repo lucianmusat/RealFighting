@@ -240,12 +240,12 @@ void player::back_to_idle(void)
 player::player(void)
 {
 	
-	player1_idle = SDL_DisplayFormat(SDL_LoadBMP("resources/idle.bmp"));
-	player1_walkf = SDL_DisplayFormat(SDL_LoadBMP("resources/walkf.bmp"));
-	player1_walkb = SDL_DisplayFormat(SDL_LoadBMP("resources/walkb.bmp"));
-	player1_punch1 = SDL_DisplayFormat(SDL_LoadBMP("resources/punch1.bmp"));
-	player1_punch2 = SDL_DisplayFormat(SDL_LoadBMP("resources/punch2.bmp"));
-	player1_kick = SDL_DisplayFormat(SDL_LoadBMP("resources/kick.bmp"));
+	player1_idle = SDL_DisplayFormat(SDL_LoadBMP("resources\\player\\idle.bmp"));
+	player1_walkf = SDL_DisplayFormat(SDL_LoadBMP("resources\\player\\walkf.bmp"));
+	player1_walkb = SDL_DisplayFormat(SDL_LoadBMP("resources\\player\\walkb.bmp"));
+	player1_punch1 = SDL_DisplayFormat(SDL_LoadBMP("resources\\player\\punch1.bmp"));
+	player1_punch2 = SDL_DisplayFormat(SDL_LoadBMP("resources\\player\\punch2.bmp"));
+	player1_kick = SDL_DisplayFormat(SDL_LoadBMP("resources\\player\\kick.bmp"));
 
 	offset.x = 50;
 	offset.y = 300;
