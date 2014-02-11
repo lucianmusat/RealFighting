@@ -1,6 +1,7 @@
 #pragma once
 #include "SDL.h"
 #include "time.h"
+#include <cstdlib>
 
 class player
 {

@@ -1,6 +1,7 @@
 #include "AIplayer.h"
 #include "SDL.h"
 #include "time.h"
+#include <cstdlib>
 
 	SDL_Surface *AIplayer_idle, *AIplayer_walkf, *AIplayer_walkb, *AIplayer_punch1, *AIplayer_punch2, *AIplayer_kick, *AIplayer_punched;
 	SDL_Rect AIoffset;
@@ -116,17 +117,17 @@ void AIplayer::idle(SDL_Surface* screen)
 void AIplayer::walkf(SDL_Surface* screen)
 {	
 	AIother_action = true;
-	if (AIoffset.x < screen->w - 226)
+	if (AIoffset.x > 0)
 		AIoffset.x-= 3;
 
 	SDL_BlitSurface(AIplayer_walkf, &AIframes_walkf[static_cast<int>(AIframe_walkf)], screen, &AIoffset);
 
-	SDL_Flip(screen);
+	//SDL_Flip(screen);
 
 	if(AIframe_walkf > 9) 
 	{
 	    AIframe_walkf = 0;
-		AIb[1] = 0;
+		//AIb[1] = 0;
     }
 	else
 	{
@@ -142,7 +143,8 @@ void AIplayer::walkf(SDL_Surface* screen)
 void AIplayer::walkb(SDL_Surface* screen)
 {	
 	AIother_action = true;
-	AIoffset.x+= 3;
+	if (AIoffset.x < screen->w - 180)
+		AIoffset.x+= 3;
 	SDL_BlitSurface(AIplayer_walkb, &AIframes_walkb[static_cast<int>(AIframe_walkb)], screen, &AIoffset);
 
 	//SDL_Flip(screen);
@@ -150,7 +152,7 @@ void AIplayer::walkb(SDL_Surface* screen)
 	if(AIframe_walkb > 9) 
 	{
 	    AIframe_walkb = 0;
-		AIb[0] = 0;
+		//AIb[0] = 0;
     }
 	else
 	{
@@ -179,7 +181,7 @@ void AIplayer::punch(SDL_Surface* screen)
 	if (AInumber == 0)
 	{
 			SDL_BlitSurface(AIplayer_punch1, &AIframes_punch1[static_cast<int>(AIframe_punch1)], screen, &AIoffset);
-			SDL_Flip(screen);
+			//SDL_Flip(screen);
 
 			if(AIframe_punch1 > 10) 
 			{
@@ -200,7 +202,7 @@ void AIplayer::punch(SDL_Surface* screen)
 	else
 	{
 			SDL_BlitSurface(AIplayer_punch2, &AIframes_punch2[static_cast<int>(AIframe_punch2)], screen, &AIoffset);
-			SDL_Flip(screen);
+			//SDL_Flip(screen);
 
 			if(AIframe_punch2 > 6) 
 			{
@@ -226,7 +228,7 @@ void AIplayer::kick(SDL_Surface* screen)
 
 	SDL_BlitSurface(AIplayer_kick, &AIframes_kick[static_cast<int>(AIframe_kick)], screen, &AIoffset);
 
-	SDL_Flip(screen);
+	//SDL_Flip(screen);
 
 	if(AIframe_kick > 4) 
 	{
@@ -250,9 +252,9 @@ void AIplayer::punched(SDL_Surface* screen)
 
 	SDL_BlitSurface(AIplayer_punched, &AIframes_punched1[static_cast<int>(AIframe_punched1)], screen, &AIoffset);
 
-	SDL_Flip(screen);
+	//SDL_Flip(screen);
 
-	if(AIframe_punched1 > 6) 
+	if(AIframe_punched1 > 5) 
 	{
 	    AIframe_punched1 = 0;
 		AIb[4]=0;
@@ -286,7 +288,7 @@ AIplayer::AIplayer(void)
 	AIplayer_punch1 = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\punch1.bmp"));
 	AIplayer_punch2 = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\punch2.bmp"));
 	AIplayer_kick = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\kick.bmp"));
-	AIplayer_punched = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\punched1.bmp"));
+	AIplayer_punched = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\punched1.bmp")); 
 
 	AIoffset.x = 500;
 	AIoffset.y = 300;
@@ -310,7 +312,7 @@ AIplayer::AIplayer(void)
 	SDL_SetColorKey(AIplayer_kick, SDL_SRCCOLORKEY, colorkey_kick);
 
 	Uint32 colorkey_punched = SDL_MapRGB(AIplayer_punched->format, 112, 136, 136);
-	SDL_SetColorKey(AIplayer_punched, SDL_SRCCOLORKEY, colorkey_punched);
+	SDL_SetColorKey(AIplayer_punched, SDL_SRCCOLORKEY, colorkey_punched); 
 	
 	AIsetrects_idle(AIframes_idle);
 	AIsetrects_walkf(AIframes_walkf);
@@ -328,7 +330,7 @@ AIplayer::AIplayer(void)
 	AIframe_kick=0;
 	AIframe_punched1=0;
 
-	AILife = 1000;
+	AILife = 20;
 }
 
 

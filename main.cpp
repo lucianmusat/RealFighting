@@ -8,6 +8,7 @@ int main(int argc, char * args[])
 {
 	bool running = true;
 	const int FPS = 60;
+	bool just_once = false;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
 		running = false;
@@ -95,9 +96,15 @@ int main(int argc, char * args[])
                                                 case SDLK_d:
 														player1.b[1] = 0;
                                                         break;                                    
+                                                case SDLK_KP6:
+                                                        player2.AIb[0] = 0;
+                                                        break;
+                                                case SDLK_KP4:
+														player2.AIb[1] = 0;
+                                                        break;          
                                         }
                                         break;
-				
+
 							    case SDL_JOYBUTTONDOWN:  /* Handle Joystick Button Presses */
 										if ( occur.jbutton.button == 2 ) 
 											player1.b[2] = 1;
@@ -125,7 +132,7 @@ int main(int argc, char * args[])
 				joystick_present = false;
 				fprintf(stdout, "Stick = null \n");
 			}
-			
+
 		   if( occur.type == SDL_JOYAXISMOTION )
 			{
         //If joystick 0 has moved
@@ -162,8 +169,9 @@ int main(int argc, char * args[])
 			}
 			}
 
-		}
+		}		
 
+		SDL_BlitSurface(stage_image,  &stage_offset, screen, NULL);
 
 		//player1 movements
 		if(player1.b[0])
@@ -174,58 +182,72 @@ int main(int argc, char * args[])
 		}
 		else if(player1.b[1])
 		{
-			if (player1.offset.x < (player2.AIoffset.x - 184))						
-				player1.walkf(screen);			
+			if (player1.offset.x < (player2.AIoffset.x - 184))
+			{
+				player1.walkf(screen);	
+			}
 			else
 			{
 				player1.offset.x-=3;
 				player1.walkf(screen);
 			}
-			
+
 			if ((player1.offset.x >= screen->w/3) && (stage_offset.x < stage_image->w - screen->w))
 				stage_offset.x+=1;
 		}
 		else if(player1.b[2])		
 		{
 			player1.punch(screen);			//punch animation
-			if (player1.offset.x > (player2.AIoffset.x - 185))  //if near AI
+			if ((player1.offset.x > (player2.AIoffset.x - 185))&&(!just_once))  //if near AI
 			{
 				player2.AILife-=1;			// Take some life from AI
 				player2.AIb[4]=1;			//animate player2 as being punched
+				just_once = true;
 			}
 		}
 		else if (player1.b[3])
+		{
 			player1.kick(screen);
+			if ((player1.offset.x > (player2.AIoffset.x - 185))&&(!just_once))  //if near AI
+			{
+				player2.AILife-=1;			// Take some life from AI
+				player2.AIb[4]=1;			//animate player2 as being punched
+				just_once = true;
+			}
+		}
 		else
-			player1.back_to_idle();
-
+		{
+			just_once = false;
+			player1.back_to_idle();			
+		}
 
 
 		//player2 movements
 
 		if(player2.AIb[0])
 		{
-			if (player2.AIoffset.x < (screen->w - 284))
 				player2.walkb(screen);
 		}
 		else if(player2.AIb[1])
 		{
-			if (player2.AIoffset.x > 0)
-				player2.walkf(screen);
+			if (player2.AIoffset.x > (player1.offset.x + 184))
+			{
+				player2.walkf(screen);				
+			}
 		}
 		else if (player2.AIb[4])
 		{
 			player2.punched(screen);
 		}
 		else
-			player2.back_to_idle();
-
-		SDL_BlitSurface(stage_image,  &stage_offset, screen, NULL);
+		{
+			player2.back_to_idle();			
+		}
 
 		player2.idle(screen);
 		player1.idle(screen);		
-
-		//SDL_Flip(screen);
+		
+		SDL_Flip(screen);
 
 		if(1000/FPS > SDL_GetTicks()-start) 
 			SDL_Delay(1000/FPS-(SDL_GetTicks()-start)); 

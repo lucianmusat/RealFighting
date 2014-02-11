@@ -1,6 +1,7 @@
 #include "player.h"
 #include "SDL.h"
 #include "time.h"
+#include <cstdlib>
 
 	SDL_Surface *player1_idle, *player1_walkf, *player1_walkb, *player1_punch1, *player1_punch2, *player1_kick;
 	SDL_Rect offset;
@@ -84,7 +85,7 @@ void player::idle(SDL_Surface* screen)
 	{
 		SDL_BlitSurface(player1_idle, &frames_idle[static_cast<int>(frame_idle)], screen, &offset);
 
-		SDL_Flip(screen);
+		//SDL_Flip(screen);
 		if(frame_idle > 8) 
 		{
 			frame_idle = 0;
@@ -109,7 +110,7 @@ void player::walkf(SDL_Surface* screen)
 
 	SDL_BlitSurface(player1_walkf, &frames_walkf[static_cast<int>(frame_walkf)], screen, &offset);
 
-	SDL_Flip(screen);
+	//SDL_Flip(screen);
 
 	if(frame_walkf > 9) 
 	{
@@ -132,7 +133,7 @@ void player::walkb(SDL_Surface* screen)
 	offset.x-= 3;
 	SDL_BlitSurface(player1_walkb, &frames_walkb[static_cast<int>(frame_walkb)], screen, &offset);
 
-	SDL_Flip(screen);
+	//SDL_Flip(screen);
 
 	if(frame_walkb > 9) 
 	{
@@ -165,7 +166,7 @@ void player::punch(SDL_Surface* screen)
 	if (number == 0)
 	{
 			SDL_BlitSurface(player1_punch1, &frames_punch1[static_cast<int>(frame_punch1)], screen, &offset);
-			SDL_Flip(screen);
+			//SDL_Flip(screen);
 
 			if(frame_punch1 > 10) 
 			{
@@ -186,7 +187,7 @@ void player::punch(SDL_Surface* screen)
 	else
 	{
 			SDL_BlitSurface(player1_punch2, &frames_punch2[static_cast<int>(frame_punch2)], screen, &offset);
-			SDL_Flip(screen);
+			//SDL_Flip(screen);
 
 			if(frame_punch2 > 6) 
 			{
@@ -212,7 +213,7 @@ void player::kick(SDL_Surface* screen)
 
 	SDL_BlitSurface(player1_kick, &frames_kick[static_cast<int>(frame_kick)], screen, &offset);
 
-	SDL_Flip(screen);
+	//SDL_Flip(screen);
 
 	if(frame_kick > 4) 
 	{
@@ -246,10 +247,11 @@ player::player(void)
 	player1_punch1 = SDL_DisplayFormat(SDL_LoadBMP("resources\\player\\punch1.bmp"));
 	player1_punch2 = SDL_DisplayFormat(SDL_LoadBMP("resources\\player\\punch2.bmp"));
 	player1_kick = SDL_DisplayFormat(SDL_LoadBMP("resources\\player\\kick.bmp"));
+	
 
 	offset.x = 50;
 	offset.y = 300;
-
+	
 	Uint32 colorkey_idle = SDL_MapRGB(player1_idle->format, 112, 136, 136);
 	SDL_SetColorKey(player1_idle, SDL_SRCCOLORKEY, colorkey_idle);
 
@@ -267,6 +269,7 @@ player::player(void)
 
 	Uint32 colorkey_kick = SDL_MapRGB(player1_kick->format, 112, 136, 136);
 	SDL_SetColorKey(player1_kick, SDL_SRCCOLORKEY, colorkey_kick);
+
 	
 	setrects_idle(frames_idle);
 	setrects_walkf(frames_walkf);
