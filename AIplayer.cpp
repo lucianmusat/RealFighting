@@ -3,9 +3,11 @@
 #include "time.h"
 #include <cstdlib>
 
-	SDL_Surface *AIplayer_idle, *AIplayer_walkf, *AIplayer_walkb, *AIplayer_punch1, *AIplayer_punch2, *AIplayer_kick, *AIplayer_punched;
+ using namespace std;
+
+	SDL_Surface *AIplayer_idle, *AIplayer_walkf, *AIplayer_walkb, *AIplayer_punch1, *AIplayer_punch2, *AIplayer_kick, *AIplayer_punched, *AIplayer_ko, *AIplayer_knocked;
 	SDL_Rect AIoffset;
-	int AIframe_idle, AIframe_walkf, AIframe_walkb, AIframe_punch1, AIframe_punch2, AIframe_kick, AIframe_punched1;
+	int AIframe_idle, AIframe_walkf, AIframe_walkb, AIframe_punch1, AIframe_punch2, AIframe_kick, AIframe_punched1, AIframe_ko1;
 	SDL_Rect AIframes_idle[10];
 	SDL_Rect AIframes_walkf[11];
 	SDL_Rect AIframes_walkb[11];
@@ -13,13 +15,18 @@
 	SDL_Rect AIframes_punch2[8];
 	SDL_Rect AIframes_kick[8];
 	SDL_Rect AIframes_punched1[15];
+	SDL_Rect AIframes_ko1[25];
 	int AIaux = 0;
 	bool AIother_action = false;
 	bool AIpunching = false;
+	bool AIfalling = false;
 	int AInumber = 0;
 	int AIslowtimes = 3;
 	int AILife = 1000;
-	static bool AIb[5] = {0,0,0,0,0};
+	int AIStrength = 1;
+	int AIKoChance = 5;
+	bool AIb[7] = {0,0,0,0,0,0,0}; //Walkf, Walkb, punch, kick, punched, falling, knockedout
+	//string player_folder = "aiplayer";
 
 void AIsetrects_idle(SDL_Rect* clip)
 {
@@ -88,6 +95,16 @@ void AIsetrects_punched1(SDL_Rect* clip)
                 clip[i].y = 0;
                 clip[i].w = 284;
                 clip[i].h = 226;
+        }
+}
+
+void AIsetrects_ko1(SDL_Rect* clip)
+{
+        for(int i = 0; i < 25; i ++) {
+                clip[i].x = 0 + i*356;
+                clip[i].y = 0;
+                clip[i].w = 356;
+                clip[i].h = 240;
         }
 }
 
@@ -271,6 +288,43 @@ void AIplayer::punched(SDL_Surface* screen)
 
 }
 
+void AIplayer::ko(SDL_Surface* screen)
+{	
+	AIother_action = true;
+	AIfalling = true;
+
+	SDL_BlitSurface(AIplayer_ko, &AIframes_ko1[static_cast<int>(AIframe_ko1)], screen, &AIoffset);
+
+	//SDL_Flip(screen);
+
+	if(AIframe_ko1 > 23) 
+	{
+	    AIframe_ko1 = 0;
+		AIfalling = false;
+		AIb[5]=0;
+		AIb[6]=1;
+    }
+	else
+	{
+		AIaux++;
+		if (AIaux == AIslowtimes)
+		{
+			AIframe_ko1 ++;
+			AIaux=0;
+		}
+	}
+
+}
+
+void AIplayer::knocked(SDL_Surface* screen)
+{	
+	AIother_action = true;
+
+	if (!AIfalling)
+		SDL_BlitSurface(AIplayer_knocked, NULL, screen, &AIoffset);
+
+}
+
 
 void AIplayer::back_to_idle(void)
 {
@@ -282,16 +336,21 @@ void AIplayer::back_to_idle(void)
 AIplayer::AIplayer(void)
 {
 	
-	AIplayer_idle = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\idle.bmp"));
+	AIplayer_idle = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\idle.bmp")); //TODO implement constant player_folder
 	AIplayer_walkf = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\walkf.bmp"));
 	AIplayer_walkb = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\walkb.bmp"));
 	AIplayer_punch1 = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\punch1.bmp"));
 	AIplayer_punch2 = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\punch2.bmp"));
 	AIplayer_kick = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\kick.bmp"));
-	AIplayer_punched = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\punched1.bmp")); 
+	AIplayer_punched = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\punched1.bmp"));
+	AIplayer_ko = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\ko1.bmp"));
+	AIplayer_knocked = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\knocked.bmp"));
 
 	AIoffset.x = 500;
 	AIoffset.y = 300;
+
+	Uint32 colorkey_knocked = SDL_MapRGB(AIplayer_knocked->format, 112, 136, 136);
+	SDL_SetColorKey(AIplayer_knocked, SDL_SRCCOLORKEY, colorkey_knocked);
 
 	Uint32 colorkey_idle = SDL_MapRGB(AIplayer_idle->format, 112, 136, 136);
 	SDL_SetColorKey(AIplayer_idle, SDL_SRCCOLORKEY, colorkey_idle);
@@ -313,6 +372,9 @@ AIplayer::AIplayer(void)
 
 	Uint32 colorkey_punched = SDL_MapRGB(AIplayer_punched->format, 112, 136, 136);
 	SDL_SetColorKey(AIplayer_punched, SDL_SRCCOLORKEY, colorkey_punched); 
+
+	Uint32 colorkey_ko = SDL_MapRGB(AIplayer_ko->format, 112, 136, 136);
+	SDL_SetColorKey(AIplayer_ko, SDL_SRCCOLORKEY, colorkey_ko);
 	
 	AIsetrects_idle(AIframes_idle);
 	AIsetrects_walkf(AIframes_walkf);
@@ -321,6 +383,7 @@ AIplayer::AIplayer(void)
 	AIsetrects_punch2(AIframes_punch2);
 	AIsetrects_kick(AIframes_kick);
 	AIsetrects_punched1(AIframes_punched1);
+	AIsetrects_ko1(AIframes_ko1);
 
 	AIframe_idle = 0;
 	AIframe_walkf=0;
@@ -329,8 +392,18 @@ AIplayer::AIplayer(void)
 	AIframe_punch2=0;
 	AIframe_kick=0;
 	AIframe_punched1=0;
+	AIframe_ko1=0;
 
-	AILife = 20;
+	AIb[0] = 0;
+	AIb[1] = 0;
+	AIb[2] = 0;
+	AIb[3] = 0;
+	AIb[4] = 0;
+	AIb[5] = 0;
+	AIb[6] = 0;
+	
+
+	AILife = 5;
 }
 
 
@@ -343,4 +416,5 @@ AIplayer::~AIplayer(void)
 	SDL_FreeSurface(AIplayer_punch2);
 	SDL_FreeSurface(AIplayer_kick);
 	SDL_FreeSurface(AIplayer_punched);
+	SDL_FreeSurface(AIplayer_ko);
 }

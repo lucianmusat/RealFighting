@@ -2,6 +2,7 @@
 #include "player.h"
 #include "AIplayer.h"
 
+using namespace std;
 
 //int _stdcall WinMain(int argc, char * args[])
 int main(int argc, char * args[])
@@ -30,15 +31,8 @@ int main(int argc, char * args[])
 	SDL_Rect stage_offset;
 	stage_offset.x=0;
 	stage_offset.y=0;	
-	player1.b[0] = 0;
-	player1.b[1] = 0;
-	player1.b[2] = 0;
-	player1.b[3] = 0;
-	player2.AIb[0] = 0;
-	player2.AIb[1] = 0;
-	player2.AIb[2] = 0;
-	player2.AIb[3] = 0;
-	player2.AIb[4] = 0;
+	stage_offset.h=600;
+	stage_offset.w=864;
 
 	SDL_Surface *stage_image;
 	stage_image = SDL_DisplayFormat(SDL_LoadBMP("resources\\stage1.bmp"));	
@@ -53,20 +47,19 @@ int main(int argc, char * args[])
 		joystick_present = true;
 	}
 	else
-		fprintf(stdout, "No joysticks found \n");
+		fprintf(stdout, "No joysticks found \n"); 
 
 	while (running)
 	{
 	start = SDL_GetTicks();
-	stage_offset.h=600;
-	stage_offset.w=864;
 
                 while(SDL_PollEvent(&occur)) {
                         switch(occur.type) {
                                 case SDL_QUIT:
                                         running = false;
                                         break;
-                                case SDL_KEYDOWN:
+
+                              case SDL_KEYDOWN:
                                         switch(occur.key.keysym.sym) {
                                                 case SDLK_a:
 														player1.b[0] = 1;
@@ -105,13 +98,13 @@ int main(int argc, char * args[])
                                         }
                                         break;
 
-							    case SDL_JOYBUTTONDOWN:  /* Handle Joystick Button Presses */
+							    case SDL_JOYBUTTONDOWN:  // Handle Joystick Button Presses 
 										if ( occur.jbutton.button == 2 ) 
 											player1.b[2] = 1;
 										if ( occur.jbutton.button == 3 ) 
 											player1.b[3] = 1;
 										break;
-							    case SDL_JOYBUTTONUP:  /* Handle Joystick Button Releases */
+							    case SDL_JOYBUTTONUP:  // Handle Joystick Button Releases
 										if ( occur.jbutton.button == 2 ) //punch
 											player1.b[2] = 0;
 										if ( occur.jbutton.button == 3 ) //kick
@@ -201,6 +194,9 @@ int main(int argc, char * args[])
 			if ((player1.offset.x > (player2.AIoffset.x - 185))&&(!just_once))  //if near AI
 			{
 				player2.AILife-=1;			// Take some life from AI
+				if(player2.AILife <1)
+					player2.AIb[5]=1;
+				else
 				player2.AIb[4]=1;			//animate player2 as being punched
 				just_once = true;
 			}
@@ -239,13 +235,21 @@ int main(int argc, char * args[])
 		{
 			player2.punched(screen);
 		}
+		else if (player2.AIb[5])
+		{
+			player2.ko(screen);
+		}
+		else if (player2.AIb[6])
+		{
+			player2.knocked(screen);
+		}
 		else
 		{
 			player2.back_to_idle();			
 		}
 
-		player2.idle(screen);
-		player1.idle(screen);		
+		player2.idle(screen); 
+		player1.idle(screen);	
 		
 		SDL_Flip(screen);
 
@@ -254,6 +258,7 @@ int main(int argc, char * args[])
 
 	}
 	player1.~player();
+	player2.~AIplayer();
 	SDL_Quit();
 	return 0;
 }

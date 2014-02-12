@@ -17,7 +17,7 @@
 	bool punching = false;
 	int number = 0;
 	int slowtimes = 3;
-	static bool b[4] = {0,0,0,0};
+	bool b[4] = {0,0,0,0};
 
 void setrects_idle(SDL_Rect* clip)
 {
@@ -284,6 +284,12 @@ player::player(void)
 	frame_punch1=0;
 	frame_punch2=0;
 	frame_kick=0;
+
+	b[0] = 0;
+	b[1] = 0;
+	b[2] = 0;
+	b[3] = 0;
+	
 }
 
 
