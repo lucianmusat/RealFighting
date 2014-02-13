@@ -1,7 +1,6 @@
 #pragma once
 #include "SDL.h"
 #include "time.h"
-#include <cstdlib>
 
 class AIplayer
 {
@@ -21,5 +20,6 @@ public:
 	SDL_Rect AIoffset;
 	bool AIb[7];
 	int AILife;
+	bool knockedout;
 };
 

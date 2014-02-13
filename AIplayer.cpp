@@ -1,7 +1,6 @@
 #include "AIplayer.h"
 #include "SDL.h"
 #include "time.h"
-#include <cstdlib>
 
  using namespace std;
 
@@ -13,7 +12,7 @@
 	SDL_Rect AIframes_walkb[11];
 	SDL_Rect AIframes_punch1[12];
 	SDL_Rect AIframes_punch2[8];
-	SDL_Rect AIframes_kick[8];
+	SDL_Rect AIframes_kick[6];
 	SDL_Rect AIframes_punched1[15];
 	SDL_Rect AIframes_ko1[25];
 	int AIaux = 0;
@@ -25,12 +24,13 @@
 	int AILife = 1000;
 	int AIStrength = 1;
 	int AIKoChance = 5;
+	bool knockedout = false;
 	bool AIb[7] = {0,0,0,0,0,0,0}; //Walkf, Walkb, punch, kick, punched, falling, knockedout
 	//string player_folder = "aiplayer";
 
 void AIsetrects_idle(SDL_Rect* clip)
 {
-        for(int i = 0; i < 12; i ++) {
+        for(int i = 0; i < 10; i ++) {
                 clip[i].x = 0 + i*224;
                 clip[i].y = 0;
                 clip[i].w = 224;
@@ -318,10 +318,12 @@ void AIplayer::ko(SDL_Surface* screen)
 
 void AIplayer::knocked(SDL_Surface* screen)
 {	
-	AIother_action = true;
+	AIother_action = true;	
 
 	if (!AIfalling)
 		SDL_BlitSurface(AIplayer_knocked, NULL, screen, &AIoffset);
+	else
+		knockedout = true;
 
 }
 
@@ -378,7 +380,7 @@ AIplayer::AIplayer(void)
 	
 	AIsetrects_idle(AIframes_idle);
 	AIsetrects_walkf(AIframes_walkf);
-	AIsetrects_walkf(AIframes_walkb);
+	AIsetrects_walkb(AIframes_walkb);
 	AIsetrects_punch1(AIframes_punch1);
 	AIsetrects_punch2(AIframes_punch2);
 	AIsetrects_kick(AIframes_kick);
@@ -417,4 +419,5 @@ AIplayer::~AIplayer(void)
 	SDL_FreeSurface(AIplayer_kick);
 	SDL_FreeSurface(AIplayer_punched);
 	SDL_FreeSurface(AIplayer_ko);
+	SDL_FreeSurface(AIplayer_knocked);
 }

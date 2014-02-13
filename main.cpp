@@ -4,8 +4,8 @@
 
 using namespace std;
 
-//int _stdcall WinMain(int argc, char * args[])
-int main(int argc, char * args[])
+int _stdcall WinMain(int argc, char * args[])
+//int main(int argc, char * args[])
 {
 	bool running = true;
 	const int FPS = 60;
@@ -171,7 +171,12 @@ int main(int argc, char * args[])
 		{
 			player1.walkb(screen);
 			if ((player1.offset.x <= screen->w/2) && (stage_offset.x > 0))
+			{
 				stage_offset.x--;
+				if (player2.AIb[6])
+					player2.AIoffset.x++;
+
+			}
 		}
 		else if(player1.b[1])
 		{
@@ -186,7 +191,11 @@ int main(int argc, char * args[])
 			}
 
 			if ((player1.offset.x >= screen->w/3) && (stage_offset.x < stage_image->w - screen->w))
-				stage_offset.x+=1;
+			{
+				stage_offset.x+=1;			
+				if (player2.AIb[6])
+					player2.AIoffset.x--;
+			}
 		}
 		else if(player1.b[2])		
 		{
@@ -194,10 +203,13 @@ int main(int argc, char * args[])
 			if ((player1.offset.x > (player2.AIoffset.x - 185))&&(!just_once))  //if near AI
 			{
 				player2.AILife-=1;			// Take some life from AI
-				if(player2.AILife <1)
+				if((player2.AILife <1)&&(!player2.AIb[6]))
 					player2.AIb[5]=1;
-				else
-				player2.AIb[4]=1;			//animate player2 as being punched
+				else if (!player2.AIb[6])
+				{
+					player2.AIb[4]=1;			//animate player2 as being punched
+
+				}
 				just_once = true;
 			}
 		}
@@ -207,7 +219,12 @@ int main(int argc, char * args[])
 			if ((player1.offset.x > (player2.AIoffset.x - 185))&&(!just_once))  //if near AI
 			{
 				player2.AILife-=1;			// Take some life from AI
-				player2.AIb[4]=1;			//animate player2 as being punched
+				if((player2.AILife <1)&&(!player2.AIb[6]))
+					player2.AIb[5]=1;
+				else if (!player2.AIb[6])
+				{
+					player2.AIb[4]=1;			//animate player2 as being punched
+				}
 				just_once = true;
 			}
 		}
@@ -248,8 +265,8 @@ int main(int argc, char * args[])
 			player2.back_to_idle();			
 		}
 
-		player2.idle(screen); 
 		player1.idle(screen);	
+		player2.idle(screen); 
 		
 		SDL_Flip(screen);
 
