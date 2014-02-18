@@ -73,7 +73,7 @@
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <OptimizeReferences>false</OptimizeReferences>
       <Version>1.0</Version>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <AdditionalDependencies>SDL.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>WinMain</EntryPointSymbol>
     </Link>

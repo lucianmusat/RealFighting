@@ -10,6 +10,7 @@ int _stdcall WinMain(int argc, char * args[])
 	bool running = true;
 	const int FPS = 60;
 	bool just_once = false;
+	int number=0;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
 		running = false;
@@ -73,12 +74,24 @@ int _stdcall WinMain(int argc, char * args[])
                                                 case SDLK_k:														
                                                         player1.b[3] = 1;
                                                         break;    
+                                                case SDLK_l:														
+                                                        player1.b[4] = 1;
+                                                        break;    
                                                 case SDLK_KP6:														
                                                         player2.AIb[0] = 1;
                                                         break;
                                                 case SDLK_KP4:														
                                                         player2.AIb[1] = 1;
                                                         break;         
+                                                case SDLK_u:														
+                                                        player2.AIb[2] = 1;
+                                                        break;
+                                                case SDLK_i:														
+                                                        player2.AIb[3] = 1;
+                                                        break;
+                                                case SDLK_o:														
+                                                        player2.AIb[4] = 1;
+                                                        break;
                                         }
                                         break;
                                 case SDL_KEYUP:
@@ -89,12 +102,18 @@ int _stdcall WinMain(int argc, char * args[])
                                                 case SDLK_d:
 														player1.b[1] = 0;
                                                         break;                                    
+                                                case SDLK_l:														
+                                                        player1.b[4] = 0;
+                                                        break;    
                                                 case SDLK_KP6:
                                                         player2.AIb[0] = 0;
                                                         break;
                                                 case SDLK_KP4:
 														player2.AIb[1] = 0;
-                                                        break;          
+                                                        break;     
+                                                case SDLK_o:														
+                                                        player2.AIb[4] = 0;
+                                                        break;
                                         }
                                         break;
 
@@ -142,6 +161,7 @@ int _stdcall WinMain(int argc, char * args[])
 						player1.b[1] = 0;
 						player1.b[2] = 0;
 						player1.b[3] = 0;
+						player1.b[4] = 0;
 					}
 					//If not
 					else
@@ -199,10 +219,25 @@ int _stdcall WinMain(int argc, char * args[])
 		}
 		else if(player1.b[2])		
 		{
-			player1.punch(screen);			//punch animation
+			player1.b[4]=0;
+			player1.punch(screen);			//punch animation			
 			if ((player1.offset.x > (player2.AIoffset.x - 185))&&(!just_once))  //if near AI
 			{
-				player2.AILife-=1;			// Take some life from AI
+				srand(time(NULL)+number);
+				number = rand() % 2;
+				player1.percent_perversa = number;
+				fprintf(stdout, "Player 1 has %d%% chances to knock out oponent. \n", player1.percent_perversa);
+				srand(time(NULL)+number);
+				number = rand() % 100;
+				fprintf(stdout, "Gods decided: %d \n", number);
+
+				if (number < player1.percent_perversa)
+				{
+					player2.AILife=0;		//Knocked out of the park
+					fprintf(stdout, "K-BOOM!! \n");
+				}
+				else 
+					player2.AILife-=1;			// Take some life from AI
 				if((player2.AILife <1)&&(!player2.AIb[6]))
 					player2.AIb[5]=1;
 				else if (!player2.AIb[6])
@@ -215,9 +250,24 @@ int _stdcall WinMain(int argc, char * args[])
 		}
 		else if (player1.b[3])
 		{
+			player1.b[4]=0;
 			player1.kick(screen);
 			if ((player1.offset.x > (player2.AIoffset.x - 185))&&(!just_once))  //if near AI
 			{
+				srand(time(NULL)+number);
+				number = rand() % 2;
+				player1.percent_perversa = number;
+				fprintf(stdout, "Player 1 has %d%% chances to knock out oponent. \n", player1.percent_perversa);
+				srand(time(NULL)+number);
+				number = rand() % 100;
+				fprintf(stdout, "Gods decided: %d \n", number);
+
+				if (number < player1.percent_perversa)
+				{
+					player2.AILife=0;		//Knocked out of the park
+					fprintf(stdout, "K-BOOM!! \n");
+				}
+				else 
 				player2.AILife-=1;			// Take some life from AI
 				if((player2.AILife <1)&&(!player2.AIb[6]))
 					player2.AIb[5]=1;
@@ -227,6 +277,10 @@ int _stdcall WinMain(int argc, char * args[])
 				}
 				just_once = true;
 			}
+		}
+		else if(player1.b[4])
+		{
+			player1.block(screen);
 		}
 		else
 		{
@@ -247,6 +301,14 @@ int _stdcall WinMain(int argc, char * args[])
 			{
 				player2.walkf(screen);				
 			}
+		}
+		else if (player2.AIb[2])
+		{
+			player2.punch(screen);
+		}
+		else if (player2.AIb[3])
+		{
+			player2.kick(screen);
 		}
 		else if (player2.AIb[4])
 		{
