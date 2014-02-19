@@ -4,9 +4,11 @@
 
  using namespace std;
 
-	SDL_Surface *AIplayer_idle, *AIplayer_walkf, *AIplayer_walkb, *AIplayer_punch1, *AIplayer_punch2, *AIplayer_punch3, *AIplayer_kick, *AIplayer_kick2, *AIplayer_punched, *AIplayer_ko, *AIplayer_knocked;
+	SDL_Surface *AIplayer_idle, *AIplayer_walkf, *AIplayer_walkb, *AIplayer_punch1, *AIplayer_punch2, *AIplayer_punch3, *AIplayer_kick, *AIplayer_kick2;
+	SDL_Surface *AIplayer_punched, *AIplayer_ko, *AIplayer_knocked, *AIplayer_block;
 	SDL_Rect AIoffset;
 	int AIframe_idle, AIframe_walkf, AIframe_walkb, AIframe_punch1, AIframe_punch2, AIframe_punch3, AIframe_kick, AIframe_kick2, AIframe_punched1, AIframe_ko1;
+	int AIframe_block;
 	SDL_Rect AIframes_idle[10];
 	SDL_Rect AIframes_walkf[11];
 	SDL_Rect AIframes_walkb[11];
@@ -17,17 +19,18 @@
 	SDL_Rect AIframes_kick2[9];
 	SDL_Rect AIframes_punched1[15];
 	SDL_Rect AIframes_ko1[25];
-	int AIaux = 0;
+	SDL_Rect AIframes_block[4];
+	int AIaux, AIaux1 = 0;
 	bool AIother_action = false;
 	bool AIpunching = false;
 	bool AIfalling = false;
 	int AInumber = 0;
 	int AIslowtimes = 3;
-	int AILife = 1000;
-	int AIStrength = 1;
+	int AILife; //life meter
+	int AIpercent_perversa;
 	bool knockedout = false;
 	bool AIshpitzing = false;
-	bool AIb[7] = {0,0,0,0,0,0,0}; //Walkf, Walkb, punch, kick, punched, falling, knockedout
+	bool AIb[8] = {0,0,0,0,0,0,0,0}; //Walkf, Walkb, punch, kick, punched, falling, knockedout, block
 	//string player_folder = "aiplayer";
 
 void AIsetrects_idle(SDL_Rect* clip)
@@ -133,6 +136,17 @@ void AIsetrects_ko1(SDL_Rect* clip)
                 clip[i].y = 0;
                 clip[i].w = 356;
                 clip[i].h = 240;
+        }
+}
+
+void AIsetrects_block(SDL_Rect* clip)
+{
+		int j=3;
+        for(int i = 0; i < 4; i ++) {
+                clip[i].x = (j * 156) - i*156;
+                clip[i].y = 0;
+                clip[i].w = 156;
+                clip[i].h = 226;
         }
 }
 
@@ -347,8 +361,6 @@ void AIplayer::punched(SDL_Surface* screen)
 
 	SDL_BlitSurface(AIplayer_punched, &AIframes_punched1[static_cast<int>(AIframe_punched1)], screen, &AIoffset);
 
-	//SDL_Flip(screen);
-
 	if(AIframe_punched1 > 5) 
 	{
 	    AIframe_punched1 = 0;
@@ -405,6 +417,27 @@ void AIplayer::knocked(SDL_Surface* screen)
 
 }
 
+void AIplayer::block(SDL_Surface* screen)
+{	
+	AIother_action = true;
+
+	SDL_BlitSurface(AIplayer_block, &AIframes_block[static_cast<int>(AIframe_block)], screen, &AIoffset);
+
+	if(AIframe_block > 2) 
+	{
+	    AIframe_block = 0;
+    }
+	else
+	{
+		AIaux1++;
+		if (AIaux1 == AIslowtimes * 2)
+		{
+			AIframe_block ++;
+			AIaux1=0;
+		}
+	}
+
+}
 
 void AIplayer::back_to_idle(void)
 {
@@ -427,6 +460,7 @@ AIplayer::AIplayer(void)
 	AIplayer_punched = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\punched1.bmp"));
 	AIplayer_ko = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\ko1.bmp"));
 	AIplayer_knocked = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\knocked.bmp"));
+	AIplayer_block = SDL_DisplayFormat(SDL_LoadBMP("resources\\aiplayer\\block.bmp"));
 
 	AIoffset.x = 500;
 	AIoffset.y = 300;
@@ -463,6 +497,9 @@ AIplayer::AIplayer(void)
 
 	Uint32 colorkey_ko = SDL_MapRGB(AIplayer_ko->format, 112, 136, 136);
 	SDL_SetColorKey(AIplayer_ko, SDL_SRCCOLORKEY, colorkey_ko);
+
+	Uint32 colorkey_block = SDL_MapRGB(AIplayer_block->format, 112, 136, 136);
+	SDL_SetColorKey(AIplayer_block, SDL_SRCCOLORKEY, colorkey_block);
 	
 	AIsetrects_idle(AIframes_idle);
 	AIsetrects_walkf(AIframes_walkf);
@@ -474,6 +511,7 @@ AIplayer::AIplayer(void)
 	AIsetrects_kick2(AIframes_kick2);
 	AIsetrects_punched1(AIframes_punched1);
 	AIsetrects_ko1(AIframes_ko1);
+	AIsetrects_block(AIframes_block);
 
 	AIframe_idle = 0;
 	AIframe_walkf=0;
@@ -485,6 +523,7 @@ AIplayer::AIplayer(void)
 	AIframe_kick2=0;
 	AIframe_punched1=0;
 	AIframe_ko1=0;
+	AIframe_block=0;
 
 	AIb[0] = 0;
 	AIb[1] = 0;
@@ -493,6 +532,7 @@ AIplayer::AIplayer(void)
 	AIb[4] = 0;
 	AIb[5] = 0;
 	AIb[6] = 0;
+	AIb[7] = 0;
 
 	srand(time(NULL)+AInumber);
 	AInumber = rand() % 20+10;
@@ -515,4 +555,5 @@ AIplayer::~AIplayer(void)
 	SDL_FreeSurface(AIplayer_punched);
 	SDL_FreeSurface(AIplayer_ko);
 	SDL_FreeSurface(AIplayer_knocked);
+	SDL_FreeSurface(AIplayer_block);
 }

@@ -9,7 +9,7 @@ int _stdcall WinMain(int argc, char * args[])
 {
 	bool running = true;
 	const int FPS = 60;
-	bool just_once = false;
+	bool just_once, just_once2 = false;
 	int number=0;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
@@ -90,7 +90,7 @@ int _stdcall WinMain(int argc, char * args[])
                                                         player2.AIb[3] = 1;
                                                         break;
                                                 case SDLK_o:														
-                                                        player2.AIb[4] = 1;
+                                                        player2.AIb[7] = 1;
                                                         break;
                                         }
                                         break;
@@ -112,7 +112,7 @@ int _stdcall WinMain(int argc, char * args[])
 														player2.AIb[1] = 0;
                                                         break;     
                                                 case SDLK_o:														
-                                                        player2.AIb[4] = 0;
+                                                        player2.AIb[7] = 0;
                                                         break;
                                         }
                                         break;
@@ -230,16 +230,23 @@ int _stdcall WinMain(int argc, char * args[])
 				srand(time(NULL)+number);
 				number = rand() % 100;
 				fprintf(stdout, "Gods decided: %d \n", number);
+				if (player2.AIb[7])
+					fprintf(stdout, "But player2 parries!");
 
-				if (number < player1.percent_perversa)
+				if ((number < player1.percent_perversa)&&(!player2.AIb[7]))
 				{
 					player2.AILife=0;		//Knocked out of the park
 					fprintf(stdout, "K-BOOM!! \n");
 				}
 				else 
-					player2.AILife-=1;			// Take some life from AI
-				if((player2.AILife <1)&&(!player2.AIb[6]))
-					player2.AIb[5]=1;
+				{
+					if(!player2.AIb[7])
+						player2.AILife-=2;			// Take life from AI
+					else
+						player2.AILife-=1;			// Take less life from AI if it blocks
+				}
+				if((player2.AILife <1)&&(!player2.AIb[6]))	//if no more life and knocked out
+					player2.AIb[5]=1;		//falling
 				else if (!player2.AIb[6])
 				{
 					player2.AIb[4]=1;			//animate player2 as being punched
@@ -261,6 +268,8 @@ int _stdcall WinMain(int argc, char * args[])
 				srand(time(NULL)+number);
 				number = rand() % 100;
 				fprintf(stdout, "Gods decided: %d \n", number);
+				if (player2.AIb[7])
+					fprintf(stdout, "But player2 parries!");
 
 				if (number < player1.percent_perversa)
 				{
@@ -268,9 +277,14 @@ int _stdcall WinMain(int argc, char * args[])
 					fprintf(stdout, "K-BOOM!! \n");
 				}
 				else 
-				player2.AILife-=1;			// Take some life from AI
-				if((player2.AILife <1)&&(!player2.AIb[6]))
-					player2.AIb[5]=1;
+				{
+					if(!player2.AIb[7])
+						player2.AILife-=2;			// Take life from AI
+					else
+						player2.AILife-=1;			// Take less life from AI if it blocks
+				}
+				if((player2.AILife <1)&&(!player2.AIb[6]))  //if no more life and knocked out
+					player2.AIb[5]=1;		//falling
 				else if (!player2.AIb[6])
 				{
 					player2.AIb[4]=1;			//animate player2 as being punched
@@ -282,6 +296,10 @@ int _stdcall WinMain(int argc, char * args[])
 		{
 			player1.block(screen);
 		}
+		else if(player1.b[5])
+		{
+			player1.punched(screen);
+		}
 		else
 		{
 			just_once = false;
@@ -291,7 +309,7 @@ int _stdcall WinMain(int argc, char * args[])
 
 		//player2 movements
 
-		if(player2.AIb[0])
+		if(player2.AIb[0]) 
 		{
 				player2.walkb(screen);
 		}
@@ -304,11 +322,77 @@ int _stdcall WinMain(int argc, char * args[])
 		}
 		else if (player2.AIb[2])
 		{
-			player2.punch(screen);
+			player2.punch(screen);			//punch animation			
+			if ((player2.AIoffset.x < (player1.offset.x + 185))&&(!just_once2))  //if near AI
+			{
+				srand(time(NULL)+number);
+				number = rand() % 2;
+				player2.AIpercent_perversa = number;
+				fprintf(stdout, "Player 2 has %d%% chances to knock out oponent. \n", player1.percent_perversa);
+				srand(time(NULL)+number);
+				number = rand() % 100;
+				fprintf(stdout, "Gods decided: %d \n", number);
+				if (player1.b[4])
+					fprintf(stdout, "But player1 parries!");
+
+				if ((number < player2.AIpercent_perversa)&&(!player1.b[4]))
+				{
+					player1.Life=0;		//Knocked out of the park
+					fprintf(stdout, "K-BOOM!! \n");
+				}
+				else 
+				{
+					if(!player1.b[4])
+						player1.Life-=2;			// Take life from AI
+					else
+						player1.Life-=1;			// Take less life from AI if it blocks
+				}
+				if((player1.Life <1)&&(!player1.b[7]))	//if no more life and knocked out
+					player1.b[6]=1;		//falling
+				else if (!player1.b[7])
+				{
+					player1.b[5]=1;			//animate player1 as being punched
+
+				}
+				just_once2 = true;
+			}
 		}
 		else if (player2.AIb[3])
 		{
-			player2.kick(screen);
+			player2.kick(screen);			//punch animation			
+			if ((player2.AIoffset.x < (player1.offset.x + 185))&&(!just_once2))  //if near AI
+			{
+				srand(time(NULL)+number);
+				number = rand() % 2;
+				player2.AIpercent_perversa = number;
+				fprintf(stdout, "Player 2 has %d%% chances to knock out oponent. \n", player1.percent_perversa);
+				srand(time(NULL)+number);
+				number = rand() % 100;
+				fprintf(stdout, "Gods decided: %d \n", number);
+				if (player1.b[4])
+					fprintf(stdout, "But player1 parries!");
+
+				if ((number < player2.AIpercent_perversa)&&(!player1.b[4]))
+				{
+					player1.Life=0;		//Knocked out of the park
+					fprintf(stdout, "K-BOOM!! \n");
+				}
+				else 
+				{
+					if(!player1.b[4])
+						player1.Life-=2;			// Take life from AI
+					else
+						player1.Life-=1;			// Take less life from AI if it blocks
+				}
+				if((player1.Life <1)&&(!player1.b[7]))	//if no more life and knocked out
+					player1.b[6]=1;		//falling
+				else if (!player1.b[7])
+				{
+					player1.b[5]=1;			//animate player1 as being punched
+
+				}
+				just_once2 = true;
+			}
 		}
 		else if (player2.AIb[4])
 		{
@@ -322,8 +406,13 @@ int _stdcall WinMain(int argc, char * args[])
 		{
 			player2.knocked(screen);
 		}
+		else if (player2.AIb[7])
+		{
+			player2.block(screen);
+		}
 		else
 		{
+			just_once2 = false;
 			player2.back_to_idle();			
 		}
 

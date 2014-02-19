@@ -3,8 +3,10 @@
 #include "time.h"
 
 	SDL_Surface *player1_idle, *player1_walkf, *player1_walkb, *player1_punch1, *player1_punch2, *player1_punch3, *player1_shut, *player1_shut2, *player1_block;
+	SDL_Surface *player1_punched, *player1_ko, *player1_knocked;
 	SDL_Rect offset;
 	int frame_idle, frame_walkf, frame_walkb, frame_punch1, frame_punch2, frame_punch3, frame_kick, frame_shut2, frame_block;
+	int frame_punched1, frame_ko, frame_knocked;
 	SDL_Rect frames_idle[10];
 	SDL_Rect frames_walkf[11];
 	SDL_Rect frames_walkb[11];
@@ -14,6 +16,8 @@
 	SDL_Rect frames_kick[6];
 	SDL_Rect frames_shut2[9];
 	SDL_Rect frames_block[4];
+	SDL_Rect frames_punched1[15];
+	SDL_Rect frames_ko1[25];
 	int aux, aux1 = 0;
 	bool other_action = false;
 	bool punching = false;
@@ -21,7 +25,8 @@
 	int number = 0;
 	int slowtimes = 3;
 	int percent_perversa;
-	bool b[5] = {0,0,0,0,0};
+	int Life; //life meter
+	bool b[8] = {0,0,0,0,0,0,0,0}; //walkf, walkb, punch, kick, block, punched, falling, knockedout
 
 void setrects_idle(SDL_Rect* clip)
 {
@@ -109,6 +114,17 @@ void setrects_block(SDL_Rect* clip)
                 clip[i].x = 0 + i*156;
                 clip[i].y = 0;
                 clip[i].w = 156;
+                clip[i].h = 226;
+        }
+}
+
+void setrects_punched1(SDL_Rect* clip)
+{
+		int j=6;
+        for(int i = 0; i < 7; i ++) {
+                clip[i].x = (j * 284) - i*284;
+                clip[i].y = 0;
+                clip[i].w = 284;
                 clip[i].h = 226;
         }
 }
@@ -323,8 +339,6 @@ void player::block(SDL_Surface* screen)
 	
 	SDL_BlitSurface(player1_block, &frames_block[static_cast<int>(frame_block)], screen, &offset);
 
-	//SDL_Flip(screen);
-
 	if(frame_block > 2) 
 	{
 	    frame_block = 0;
@@ -338,6 +352,29 @@ void player::block(SDL_Surface* screen)
 			aux1=0;
 		}
 	}
+}
+
+void player::punched(SDL_Surface* screen)
+{	
+	other_action = true;
+
+	SDL_BlitSurface(player1_punched, &frames_punched1[static_cast<int>(frame_punched1)], screen, &offset);
+
+	if(frame_punched1 > 5) 
+	{
+	    frame_punched1 = 0;
+		b[5]=0;
+    }
+	else
+	{
+		aux++;
+		if (aux == slowtimes)
+		{
+			frame_punched1 ++;
+			aux=0;
+		}
+	}
+
 }
 
 void player::back_to_idle(void)
@@ -359,6 +396,7 @@ player::player(void)
 	player1_shut = SDL_DisplayFormat(SDL_LoadBMP("resources\\player\\kick.bmp"));
 	player1_shut2 = SDL_DisplayFormat(SDL_LoadBMP("resources\\player\\kick2.bmp"));
 	player1_block = SDL_DisplayFormat(SDL_LoadBMP("resources\\player\\block.bmp"));
+	player1_punched = SDL_DisplayFormat(SDL_LoadBMP("resources\\player\\punched1.bmp"));
 
 	offset.x = 50;
 	offset.y = 300;
@@ -390,6 +428,8 @@ player::player(void)
 	Uint32 colorkey_block = SDL_MapRGB(player1_block->format, 112, 136, 136);
 	SDL_SetColorKey(player1_block, SDL_SRCCOLORKEY, colorkey_block);
 
+	Uint32 colorkey_punched = SDL_MapRGB(player1_punched->format, 112, 136, 136);
+	SDL_SetColorKey(player1_punched, SDL_SRCCOLORKEY, colorkey_punched); 
 	
 	setrects_idle(frames_idle);
 	setrects_walkf(frames_walkf);
@@ -400,6 +440,7 @@ player::player(void)
 	setrects_kick(frames_kick);
 	setrects_shut2(frames_shut2);
 	setrects_block(frames_block);
+	setrects_punched1(frames_punched1);
 
 	frame_idle = 0;
 	frame_walkf = 0;
@@ -410,12 +451,21 @@ player::player(void)
 	frame_kick = 0;
 	frame_shut2 = 0;
 	frame_block = 0;
+	frame_punched1=0;
 
 	b[0] = 0;
 	b[1] = 0;
 	b[2] = 0;
 	b[3] = 0;
-	b[4] = 0;	
+	b[4] = 0;
+	b[5] = 0;
+	b[6] = 0;
+
+	srand(time(NULL)+number);
+	number = rand() % 20+10;
+
+	Life = number;
+	fprintf(stdout, "Player1 Life: %d \n", number);
 }
 
 
@@ -430,4 +480,7 @@ player::~player(void)
 	SDL_FreeSurface(player1_shut);
 	SDL_FreeSurface(player1_shut2);
 	SDL_FreeSurface(player1_block);
+	SDL_FreeSurface(player1_punched);
+	SDL_FreeSurface(player1_ko);
+	SDL_FreeSurface(player1_knocked);
 }

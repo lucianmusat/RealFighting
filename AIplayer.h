@@ -13,6 +13,7 @@ public:
 	void punched(SDL_Surface* clip);
 	void ko(SDL_Surface* clip);
 	void knocked(SDL_Surface* clip);
+	void block(SDL_Surface* clip);
 	void AIplayer::back_to_idle(void);
 	AIplayer(void);
 	~AIplayer(void);
@@ -21,5 +22,6 @@ public:
 	bool AIb[7];
 	int AILife;
 	bool knockedout;
+	int AIpercent_perversa;
 };
 
