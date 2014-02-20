@@ -122,8 +122,8 @@ void setrects_block(SDL_Rect* clip)
 
 void setrects_punched1(SDL_Rect* clip)
 {
-		int j=6;
-        for(int i = 0; i < 7; i ++) {
+		int j=5;
+        for(int i = 0; i < 6; i ++) {
                 clip[i].x = (j * 284) - i*284;
                 clip[i].y = 0;
                 clip[i].w = 284;
@@ -373,7 +373,7 @@ void player::punched(SDL_Surface* screen)
 
 	SDL_BlitSurface(player1_punched, &frames_punched1[static_cast<int>(frame_punched1)], screen, &offset);
 
-	if(frame_punched1 > 5) 
+	if(frame_punched1 > 4) 
 	{
 	    frame_punched1 = 0;
 		b[5]=0;

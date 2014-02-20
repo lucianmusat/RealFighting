@@ -1,8 +1,28 @@
 #include "SDL.h"
 #include "player.h"
 #include "AIplayer.h"
+#include <ctime>
 
 using namespace std;
+
+int returul,counter,fps_counter=0;
+
+int waitfor(int i)
+{	
+	fps_counter++;
+	if (fps_counter == 61)
+	{
+		counter++;
+		fps_counter=0;
+	}
+	if (counter == i)
+	{
+		counter = 0;
+		return 1;
+	}
+	else
+		return 0;
+}
 
 int _stdcall WinMain(int argc, char * args[])
 //int main(int argc, char * args[])
@@ -11,6 +31,7 @@ int _stdcall WinMain(int argc, char * args[])
 	const int FPS = 60;
 	bool just_once, just_once2 = false;
 	int number=0;
+	int chance_of_perversa = 2;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
 		running = false;
@@ -19,7 +40,7 @@ int _stdcall WinMain(int argc, char * args[])
 	screen = SDL_SetVideoMode(800, 600, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
 	SDL_GL_SwapBuffers();
 
-	SDL_WM_SetCaption("Real Fighting Alfa 1.0", NULL);
+	SDL_WM_SetCaption("Real Fighting Alfa 1.1", NULL);
 
 	if (screen == NULL)
 		running=false;
@@ -34,6 +55,9 @@ int _stdcall WinMain(int argc, char * args[])
 	stage_offset.y=0;	
 	stage_offset.h=600;
 	stage_offset.w=864;
+
+	srand(time(0));
+	int AIaction = 99;
 
 	SDL_Surface *stage_image;
 	stage_image = SDL_DisplayFormat(SDL_LoadBMP("resources\\stage1.bmp"));	
@@ -187,7 +211,7 @@ int _stdcall WinMain(int argc, char * args[])
 		SDL_BlitSurface(stage_image,  &stage_offset, screen, NULL);
 
 		//player1 movements
-		if(player1.b[0])
+		if((player1.b[0])&&(!player1.b[7]))
 		{
 			player1.walkb(screen);
 			if ((player1.offset.x <= screen->w/2) && (stage_offset.x > 0)&&(player2.AIoffset.x < screen->w-190))
@@ -200,7 +224,7 @@ int _stdcall WinMain(int argc, char * args[])
 
 			}
 		}
-		else if(player1.b[1])
+		else if((player1.b[1])&&(!player1.b[7]))
 		{
 			if (player1.offset.x < (player2.AIoffset.x - 184))
 			{
@@ -212,24 +236,23 @@ int _stdcall WinMain(int argc, char * args[])
 				player1.walkf(screen);
 			}
 
-			if ((player1.offset.x >= screen->w/3) && (stage_offset.x < stage_image->w - screen->w))
+			if ((player1.offset.x >= screen->w/3) && (stage_offset.x < stage_image->w - screen->w))  //stage movement
 			{
-				stage_offset.x+=1;			
-				if (player2.AIb[6])
-					player2.AIoffset.x--;
+				stage_offset.x+=1;	
+				player2.AIoffset.x--;
+	//			if (player2.AIb[6])
+	//				player2.AIoffset.x--;
 			}
 		}
-		else if(player1.b[2])		
+		else if((player1.b[2])&&(!player1.b[7]))		
 		{
 			player1.b[4]=0;
 			player1.punch(screen);			//punch animation			
 			if ((player1.offset.x > (player2.AIoffset.x - 185))&&(!just_once))  //if near AI
 			{
-				srand(time(NULL)+number);
-				number = rand() % 2;
+				number = rand() % chance_of_perversa;
 				player1.percent_perversa = number;
 				fprintf(stdout, "Player 1 has %d%% chances to knock out oponent. \n", player1.percent_perversa);
-				srand(time(NULL)+number);
 				number = rand() % 100;
 				fprintf(stdout, "Gods decided: %d \n", number);
 				if (player2.AIb[7])
@@ -257,17 +280,15 @@ int _stdcall WinMain(int argc, char * args[])
 				just_once = true;
 			}
 		}
-		else if (player1.b[3])
+		else if ((player1.b[3])&&(!player1.b[7]))
 		{
 			player1.b[4]=0;
 			player1.kick(screen);
 			if ((player1.offset.x > (player2.AIoffset.x - 185))&&(!just_once))  //if near AI
 			{
-				srand(time(NULL)+number);
-				number = rand() % 2;
+				number = rand() % chance_of_perversa;
 				player1.percent_perversa = number;
 				fprintf(stdout, "Player 1 has %d%% chances to knock out oponent. \n", player1.percent_perversa);
-				srand(time(NULL)+number);
 				number = rand() % 100;
 				fprintf(stdout, "Gods decided: %d \n", number);
 				if (player2.AIb[7])
@@ -294,7 +315,7 @@ int _stdcall WinMain(int argc, char * args[])
 				just_once = true;
 			}
 		}
-		else if(player1.b[4])
+		else if((player1.b[4])&&(!player1.b[7]))
 		{
 			player1.block(screen);
 		}
@@ -319,26 +340,29 @@ int _stdcall WinMain(int argc, char * args[])
 
 		//player2 movements
 
-		if(player2.AIb[0]) 
+		if((player2.AIb[0])&&(!player2.AIb[6])) 
 		{
 				player2.walkb(screen);
 		}
-		else if(player2.AIb[1])
+		else if((player2.AIb[1])&&(!player2.AIb[6]))
 		{
 			if (player2.AIoffset.x > (player1.offset.x + 184))
 			{
 				player2.walkf(screen);				
+			}else
+			{
+				player2.AIoffset.x+=3;
+				player2.walkf(screen);
 			}
 		}
-		else if (player2.AIb[2])
+		else if ((player2.AIb[2])&&(!player2.AIb[6]))
 		{
 			player2.punch(screen);			//punch animation			
 			if ((player2.AIoffset.x < (player1.offset.x + 185))&&(!just_once2))  //if near AI
-			{
-				srand(time(NULL)+number);
-				number = rand() % 2;
+			{				
+				number = rand() % chance_of_perversa;
 				player2.AIpercent_perversa = number;
-				fprintf(stdout, "Player 2 has %d%% chances to knock out oponent. \n", player1.percent_perversa);
+				fprintf(stdout, "Player 2 has %d%% chances to knock out oponent. \n", player2.AIpercent_perversa);
 				srand(time(NULL)+number);
 				number = rand() % 100;
 				fprintf(stdout, "Gods decided: %d \n", number);
@@ -367,16 +391,14 @@ int _stdcall WinMain(int argc, char * args[])
 				just_once2 = true;
 			}
 		}
-		else if (player2.AIb[3])
+		else if ((player2.AIb[3])&&(!player2.AIb[6]))
 		{
 			player2.kick(screen);			//punch animation			
 			if ((player2.AIoffset.x < (player1.offset.x + 185))&&(!just_once2))  //if near AI
 			{
-				srand(time(NULL)+number);
-				number = rand() % 2;
+				number = rand() % chance_of_perversa;
 				player2.AIpercent_perversa = number;
-				fprintf(stdout, "Player 2 has %d%% chances to knock out oponent. \n", player1.percent_perversa);
-				srand(time(NULL)+number);
+				fprintf(stdout, "Player 2 has %d%% chances to knock out oponent. \n", player2.AIpercent_perversa);
 				number = rand() % 100;
 				fprintf(stdout, "Gods decided: %d \n", number);
 				if (player1.b[4])
@@ -416,7 +438,7 @@ int _stdcall WinMain(int argc, char * args[])
 		{
 			player2.knocked(screen);
 		}
-		else if (player2.AIb[7])
+		else if ((player2.AIb[7])&&(!player2.AIb[6]))
 		{
 			player2.block(screen);
 		}
@@ -428,6 +450,36 @@ int _stdcall WinMain(int argc, char * args[])
 
 		player1.idle(screen);	
 		player2.idle(screen); 
+
+		//AI decision making
+		if ((waitfor(1)==1)&&(!player2.AIb[5])&&(!player2.AIb[6])&&(!player1.b[7]))
+		{
+			if (AIaction == 99 ) //AI has not acted
+			{
+				if (player2.AIoffset.x < (player1.offset.x + 185))
+				{
+					number = rand() % 4;  //if close from player1 strike or back off
+					if (number == 1)
+						number++;
+				}	
+				else
+				{
+					number = rand() % 3; //if far from player1 move or stay idle
+					if (number == 2)
+						number=99;
+				}
+				player2.AIb[number]=true;
+				AIaction = number;
+			}
+			else
+			{
+				player2.AIb[AIaction]=false;  //Disable last AI action
+				AIaction = 99; 
+			}
+			fprintf(stdout, "AI action: %d \n", AIaction);	
+		}					
+	
+		//End AI decision making
 		
 		SDL_Flip(screen);
 
