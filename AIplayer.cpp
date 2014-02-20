@@ -28,7 +28,7 @@
 	int AIslowtimes = 3;
 	int AILife; //life meter
 	int AIpercent_perversa;
-	bool knockedout = false;
+	bool AIknockedout = false;
 	bool AIshpitzing = false;
 	bool AIb[8] = {0,0,0,0,0,0,0,0}; //Walkf, Walkb, punch, kick, punched, falling, knockedout, block
 	//string player_folder = "aiplayer";
@@ -413,7 +413,7 @@ void AIplayer::knocked(SDL_Surface* screen)
 	if (!AIfalling)
 		SDL_BlitSurface(AIplayer_knocked, NULL, screen, &AIoffset);
 	else
-		knockedout = true;
+		AIknockedout = true;
 
 }
 

@@ -190,10 +190,12 @@ int _stdcall WinMain(int argc, char * args[])
 		if(player1.b[0])
 		{
 			player1.walkb(screen);
-			if ((player1.offset.x <= screen->w/2) && (stage_offset.x > 0))
+			if ((player1.offset.x <= screen->w/2) && (stage_offset.x > 0)&&(player2.AIoffset.x < screen->w-190))
 			{
 				stage_offset.x--;
 				if (player2.AIb[6])
+					player2.AIoffset.x++;
+				if ((!player2.AIb[0])&&(!player2.AIb[1]))
 					player2.AIoffset.x++;
 
 			}
@@ -245,7 +247,7 @@ int _stdcall WinMain(int argc, char * args[])
 					else
 						player2.AILife-=1;			// Take less life from AI if it blocks
 				}
-				if((player2.AILife <1)&&(!player2.AIb[6]))	//if no more life and knocked out
+				if((player2.AILife <1)&&(!player2.AIb[6]))	//if no more life and not knocked out
 					player2.AIb[5]=1;		//falling
 				else if (!player2.AIb[6])
 				{
@@ -283,7 +285,7 @@ int _stdcall WinMain(int argc, char * args[])
 					else
 						player2.AILife-=1;			// Take less life from AI if it blocks
 				}
-				if((player2.AILife <1)&&(!player2.AIb[6]))  //if no more life and knocked out
+				if((player2.AILife <1)&&(!player2.AIb[6]))  //if no more life and not knocked out
 					player2.AIb[5]=1;		//falling
 				else if (!player2.AIb[6])
 				{
@@ -299,6 +301,14 @@ int _stdcall WinMain(int argc, char * args[])
 		else if(player1.b[5])
 		{
 			player1.punched(screen);
+		}
+		else if (player1.b[6])
+		{
+			player1.ko(screen);
+		}
+		else if (player1.b[7])
+		{
+			player1.knocked(screen);
 		}
 		else
 		{

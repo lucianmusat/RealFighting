@@ -12,6 +12,8 @@ public:
 	void kick(SDL_Surface* clip);
 	void block(SDL_Surface* clip);
 	void punched(SDL_Surface* clip);
+	void ko(SDL_Surface* clip);
+	void knocked(SDL_Surface* clip);
 	void player::back_to_idle(void);
 	player(void);
 	~player(void);
