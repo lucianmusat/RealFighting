@@ -19,7 +19,7 @@ public:
 	~player(void);
 
 	SDL_Rect offset;
-	bool b[4];
+	bool b[8];
 	int percent_perversa;
 	int Life;
 };

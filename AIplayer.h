@@ -19,9 +19,9 @@ public:
 	~AIplayer(void);
 
 	SDL_Rect AIoffset;
-	bool AIb[7];
+	bool AIb[8];
 	int AILife;
-	bool knockedout;
+	//bool knockedout;
 	int AIpercent_perversa;
 };
 

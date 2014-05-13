@@ -47,7 +47,9 @@ int _stdcall WinMain(int argc, char * args[])
 
 	SDL_Event occur;	
 	player player1;
+	player1.b[7]=0; //not knocked out at the beggining. bug workaround.
 	AIplayer player2;
+
 
 	Uint32 start;
 	SDL_Rect stage_offset;
@@ -448,6 +450,7 @@ int _stdcall WinMain(int argc, char * args[])
 			player2.back_to_idle();			
 		}
 
+
 		player1.idle(screen);	
 		player2.idle(screen); 
 
@@ -477,7 +480,7 @@ int _stdcall WinMain(int argc, char * args[])
 				AIaction = 99; 
 			}
 			fprintf(stdout, "AI action: %d \n", AIaction);	
-		}					
+		}	
 	
 		//End AI decision making
 		

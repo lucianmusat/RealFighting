@@ -9,15 +9,15 @@
 	SDL_Rect AIoffset;
 	int AIframe_idle, AIframe_walkf, AIframe_walkb, AIframe_punch1, AIframe_punch2, AIframe_punch3, AIframe_kick, AIframe_kick2, AIframe_punched1, AIframe_ko1;
 	int AIframe_block;
-	SDL_Rect AIframes_idle[10];
-	SDL_Rect AIframes_walkf[11];
-	SDL_Rect AIframes_walkb[11];
+	SDL_Rect AIframes_idle[12];
+	SDL_Rect AIframes_walkf[14];
+	SDL_Rect AIframes_walkb[14];
 	SDL_Rect AIframes_punch1[12];
-	SDL_Rect AIframes_punch2[8];
-	SDL_Rect AIframes_punch3[11];
+	SDL_Rect AIframes_punch2[14];
+	SDL_Rect AIframes_punch3[19];
 	SDL_Rect AIframes_kick[6];
 	SDL_Rect AIframes_kick2[9];
-	SDL_Rect AIframes_punched1[15];
+	SDL_Rect AIframes_punched1[8];
 	SDL_Rect AIframes_ko1[25];
 	SDL_Rect AIframes_block[4];
 	int AIaux, AIaux1 = 0;
@@ -35,65 +35,62 @@
 
 void AIsetrects_idle(SDL_Rect* clip)
 {
-        for(int i = 0; i < 10; i ++) {
-                clip[i].x = 0 + i*224;
+        for(int i = 0; i < 12; i++) {
+                clip[i].x = 0 + i*226;
                 clip[i].y = 0;
-                clip[i].w = 224;
+                clip[i].w = 226;
                 clip[i].h = 226;
         }
 }
 
 void AIsetrects_walkf(SDL_Rect* clip)
 {
-        for(int i = 0; i < 11; i ++) {
-                clip[i].x = 0 + i*224;
+        for(int i = 0; i < 14; i ++) {
+                clip[i].x = 0 + i*242;
                 clip[i].y = 0;
-                clip[i].w = 224;
-                clip[i].h = 226;
+                clip[i].w = 242;
+                clip[i].h = 244;
         }
 }
 
 void AIsetrects_walkb(SDL_Rect* clip)
 {
-        for(int i = 0; i < 11; i ++) {
-                clip[i].x = 0 + i*224;
+        for(int i = 0; i < 14; i++) {
+                clip[i].x = 0 + i*242;
                 clip[i].y = 0;
-                clip[i].w = 224;
-                clip[i].h = 226;
+                clip[i].w = 242;
+                clip[i].h = 252;
         }
 }
 
 void AIsetrects_punch1(SDL_Rect* clip)
 {
-		int j=11;
-        for(int i = 0; i < 12; i ++)
+        for(int i = 0; i < 8; i ++)
 		{
-                clip[i].x = (j * 260) - i*260;
+                clip[i].x = 0 + i*282;
                 clip[i].y = 0;
-                clip[i].w = 260;
-                clip[i].h = 226;				
+                clip[i].w = 282;
+                clip[i].h = 224;				
         }
 }
 
 void AIsetrects_punch2(SDL_Rect* clip)
 {
-		int j=7;
-        for(int i = 0; i < 8; i ++) {
-                clip[i].x = (j * 260) - i*260;
+        for(int i = 0; i < 14; i ++) {
+                clip[i].x = 0 + i*296;
                 clip[i].y = 0;
-                clip[i].w = 260;
-                clip[i].h = 226;
+                clip[i].w = 296;
+                clip[i].h = 232;
         }
 }
 
 void AIsetrects_punch3(SDL_Rect* clip)
 {
-		int j=10;
-        for(int i = 0; i < 11; i ++) {
-                clip[i].x = (j * 260) - i*260;
+        for(int i = 0; i < 19; i ++) {
+                clip[i].x = 0 + i*348;
                 clip[i].y = 0;
-                clip[i].w = 260;
-                clip[i].h = 226;
+                clip[i].w = 348;
+                clip[i].h = 238;
         }
 }
 
@@ -121,7 +118,7 @@ void AIsetrects_kick2(SDL_Rect* clip)
 
 void AIsetrects_punched1(SDL_Rect* clip)
 {
-        for(int i = 0; i < 7; i ++) {
+        for(int i = 0; i < 8; i ++) {
                 clip[i].x = 0 + i*284;
                 clip[i].y = 0;
                 clip[i].w = 284;
@@ -157,16 +154,16 @@ void AIplayer::idle(SDL_Surface* screen)
 		SDL_BlitSurface(AIplayer_idle, &AIframes_idle[static_cast<int>(AIframe_idle)], screen, &AIoffset);
 
 		//SDL_Flip(screen);
-		if(AIframe_idle > 8) 
+		if(AIframe_idle > 10) 
 		{
 			AIframe_idle = 0;
 		}
 		else
 		{
 			AIaux++;
-			if (AIaux == AIslowtimes)
+			if (AIaux % AIslowtimes == 0)
 			{
-				AIframe_idle ++;
+				AIframe_idle++;
 				AIaux=0;
 			}
 		}
@@ -181,9 +178,7 @@ void AIplayer::walkf(SDL_Surface* screen)
 
 	SDL_BlitSurface(AIplayer_walkf, &AIframes_walkf[static_cast<int>(AIframe_walkf)], screen, &AIoffset);
 
-	//SDL_Flip(screen);
-
-	if(AIframe_walkf > 9) 
+	if(AIframe_walkf > 12) 
 	{
 	    AIframe_walkf = 0;
 		//AIb[1] = 0;
@@ -191,7 +186,7 @@ void AIplayer::walkf(SDL_Surface* screen)
 	else
 	{
 		AIaux++;
-		if (AIaux == AIslowtimes)
+		if (AIaux % AIslowtimes == 0)
 		{
 			AIframe_walkf ++;
 			AIaux=0;
@@ -204,11 +199,11 @@ void AIplayer::walkb(SDL_Surface* screen)
 	AIother_action = true;
 	if (AIoffset.x < screen->w - 180)
 		AIoffset.x+= 3;
+	
 	SDL_BlitSurface(AIplayer_walkb, &AIframes_walkb[static_cast<int>(AIframe_walkb)], screen, &AIoffset);
 
-	//SDL_Flip(screen);
 
-	if(AIframe_walkb > 9) 
+	if(AIframe_walkb > 12) 
 	{
 	    AIframe_walkb = 0;
 		//AIb[0] = 0;
@@ -216,7 +211,7 @@ void AIplayer::walkb(SDL_Surface* screen)
 	else
 	{
 		AIaux++;
-		if (AIaux == AIslowtimes)
+		if (AIaux % AIslowtimes == 0)
 		{
 			AIframe_walkb ++;
 			AIaux=0;
@@ -227,6 +222,9 @@ void AIplayer::walkb(SDL_Surface* screen)
 void AIplayer::punch(SDL_Surface* screen)
 {		
 
+	AIother_action = true;
+	AIpunching = true;
+
 	if ((AIframe_punch1 == 0)&&(AIframe_punch2 == 0)&&(AIframe_punch3 == 0)&&(!AIpunching))
 	{	
 		srand( time(NULL)+AInumber );
@@ -234,15 +232,11 @@ void AIplayer::punch(SDL_Surface* screen)
 		//fprintf(stdout, "Random number: %d \n", number);
 	}
 
-	AIother_action = true;
-	AIpunching = true;
-
 	if (AInumber == 0)
 	{			
 			SDL_BlitSurface(AIplayer_punch1, &AIframes_punch1[static_cast<int>(AIframe_punch1)], screen, &AIoffset);
-			//SDL_Flip(screen);
 
-			if(AIframe_punch1 > 10) 
+			if(AIframe_punch1 > 6) 
 			{
 				AIframe_punch1 = 0;
 				AIpunching = false;
@@ -251,7 +245,7 @@ void AIplayer::punch(SDL_Surface* screen)
 			else
 			{
 				AIaux++;
-				if (AIaux == AIslowtimes)
+				if (AIaux % AIslowtimes == 0)
 				{
 					AIframe_punch1 ++;
 					AIaux=0;
@@ -262,7 +256,7 @@ void AIplayer::punch(SDL_Surface* screen)
 	{
 			SDL_BlitSurface(AIplayer_punch2, &AIframes_punch2[static_cast<int>(AIframe_punch2)], screen, &AIoffset);
 
-			if(AIframe_punch2 > 6) 
+			if(AIframe_punch2 > 12) 
 			{
 				AIframe_punch2 = 0;
 				AIpunching = false;
@@ -271,7 +265,7 @@ void AIplayer::punch(SDL_Surface* screen)
 			else
 			{
 				AIaux++;
-				if (AIaux == AIslowtimes)
+				if (AIaux % AIslowtimes == 0)
 				{
 					AIframe_punch2 ++;
 					AIaux=0;
@@ -279,10 +273,10 @@ void AIplayer::punch(SDL_Surface* screen)
 			}
 	}
 	else
-	{
+	{ 
 			SDL_BlitSurface(AIplayer_punch3, &AIframes_punch3[static_cast<int>(AIframe_punch3)], screen, &AIoffset);
 
-			if(AIframe_punch3 > 9) 
+			if(AIframe_punch3 > 17) 
 			{
 				AIframe_punch3 = 0;
 				AIpunching = false;
@@ -291,7 +285,7 @@ void AIplayer::punch(SDL_Surface* screen)
 			else
 			{
 				AIaux++;
-				if (AIaux == AIslowtimes)
+				if (AIaux % AIslowtimes == 0)
 				{
 					AIframe_punch3 ++;
 					AIaux=0;
@@ -326,7 +320,7 @@ void AIplayer::kick(SDL_Surface* screen)
 		else
 		{
 			AIaux++;
-			if (AIaux == AIslowtimes)
+			if (AIaux % AIslowtimes == 0)
 			{
 				AIframe_kick ++;
 				AIaux=0;
@@ -346,7 +340,7 @@ void AIplayer::kick(SDL_Surface* screen)
 		else
 		{
 			AIaux++;
-			if (AIaux == AIslowtimes)
+			if (AIaux % AIslowtimes == 0)
 			{
 				AIframe_kick2 ++;
 				AIaux=0;
@@ -358,10 +352,10 @@ void AIplayer::kick(SDL_Surface* screen)
 void AIplayer::punched(SDL_Surface* screen)
 {	
 	AIother_action = true;
-
+		
 	SDL_BlitSurface(AIplayer_punched, &AIframes_punched1[static_cast<int>(AIframe_punched1)], screen, &AIoffset);
 
-	if(AIframe_punched1 > 5) 
+	if(AIframe_punched1 > 6) 
 	{
 	    AIframe_punched1 = 0;
 		AIb[4]=0;
@@ -369,12 +363,12 @@ void AIplayer::punched(SDL_Surface* screen)
 	else
 	{
 		AIaux++;
-		if (AIaux == AIslowtimes)
+		if (AIaux % AIslowtimes == 0)
 		{
 			AIframe_punched1 ++;
 			AIaux=0;
 		}
-	}
+	}	
 
 }
 
@@ -384,8 +378,6 @@ void AIplayer::ko(SDL_Surface* screen)
 	AIfalling = true;
 
 	SDL_BlitSurface(AIplayer_ko, &AIframes_ko1[static_cast<int>(AIframe_ko1)], screen, &AIoffset);
-
-	//SDL_Flip(screen);
 
 	if(AIframe_ko1 > 23) 
 	{
@@ -397,7 +389,7 @@ void AIplayer::ko(SDL_Surface* screen)
 	else
 	{
 		AIaux++;
-		if (AIaux == AIslowtimes)
+		if (AIaux % AIslowtimes == 0)
 		{
 			AIframe_ko1 ++;
 			AIaux=0;
@@ -430,7 +422,7 @@ void AIplayer::block(SDL_Surface* screen)
 	else
 	{
 		AIaux1++;
-		if (AIaux1 == AIslowtimes * 2)
+		if (AIaux % AIslowtimes == 0)
 		{
 			AIframe_block ++;
 			AIaux1=0;
